@@ -1,3 +1,5 @@
+@file:JvmName("Examples")
+
 package org.vitrivr.cottontail.examples
 
 import io.grpc.ManagedChannelBuilder
@@ -9,6 +11,7 @@ import org.vitrivr.cottontail.grpc.CottontailGrpc
 import org.vitrivr.cottontail.utilities.VectorUtility
 import java.io.InputStreamReader
 import kotlin.time.ExperimentalTime
+
 
 /** Cottontail DB gRPC channel; adjust Cottontail DB host and port according to your needs. */
 private val channel = ManagedChannelBuilder.forAddress("127.0.0.1", 1865).usePlaintext().build()

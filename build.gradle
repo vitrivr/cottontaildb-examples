@@ -45,6 +45,11 @@ protobuf {
     }
 }
 
+task runKotlinExample(type: JavaExec) {
+    main = 'org.vitrivr.cottontail.examples.Examples'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-script-runtime', version: '1.3.61'
