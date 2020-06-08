@@ -7,6 +7,7 @@ import org.vitrivr.cottontail.grpc.CottonDMLGrpc
 import org.vitrivr.cottontail.grpc.CottonDQLGrpc
 import org.vitrivr.cottontail.grpc.CottontailGrpc
 import org.vitrivr.cottontail.utilities.VectorUtility
+import java.io.BufferedReader
 import java.io.InputStreamReader
 import kotlin.time.ExperimentalTime
 
@@ -91,33 +92,32 @@ fun importData() = entities.forEach {
 
     /* Load data from file (in resources folder). */
     val classloader = Thread.currentThread().contextClassLoader
-    val reader = InputStreamReader(classloader.getResourceAsStream(it.first))
-    val lines = reader.readLines()
+    BufferedReader(InputStreamReader(classloader.getResourceAsStream(it.first))).useLines { lines ->
+        lines.forEach { l ->
+            val split = l.split('\t')
 
-    for (l in lines) {
-        val split = l.split('\t')
+            /* Prepare data for first (id) column. */
+            val id = CottontailGrpc.Data.newBuilder().setStringData(split[0]).build()
 
-        /* Prepare data for first (id) column. */
-        val id = CottontailGrpc.Data.newBuilder().setStringData(split[0]).build()
+            /* Prepare data for second (feature) column. */
+            val vector = CottontailGrpc.FloatVector.newBuilder()
+            for (e in split[3].split(' ')) {
+                vector.addVector(e.toFloat())
+            }
+            val feature = CottontailGrpc.Data.newBuilder().setVectorData(CottontailGrpc.Vector.newBuilder().setFloatVector(vector)).build()
 
-        /* Prepare data for second (feature) column. */
-        val vector = CottontailGrpc.FloatVector.newBuilder()
-        for (e in split[3].split(' ')) {
-            vector.addVector(e.toFloat())
+            /* Prepare INSERT message. */
+            val insertMessage = CottontailGrpc.InsertMessage.newBuilder()
+                .setEntity(CottontailGrpc.Entity.newBuilder().setName(it.first).setSchema(CottontailGrpc.Schema.newBuilder().setName(schema_name))) /* Entity the data should be inserted into. */
+                .setTuple(CottontailGrpc.Tuple.newBuilder()
+                    .putData("id", id) /* Data for first (id) column. */
+                    .putData("feature", feature) /* Data for second (feature) column. */
+                )
+                .build()
+
+            /* Send INSERT message. */
+            stub.onNext(insertMessage)
         }
-        val feature = CottontailGrpc.Data.newBuilder().setVectorData(CottontailGrpc.Vector.newBuilder().setFloatVector(vector)).build()
-
-        /* Prepare INSERT message. */
-        val insertMessage = CottontailGrpc.InsertMessage.newBuilder()
-            .setEntity(CottontailGrpc.Entity.newBuilder().setName(it.first).setSchema(CottontailGrpc.Schema.newBuilder().setName(schema_name))) /* Entity the data should be inserted into. */
-            .setTuple(CottontailGrpc.Tuple.newBuilder()
-                .putData("id", id) /* Data for first (id) column. */
-                .putData("feature", feature) /* Data for second (feature) column. */
-            )
-            .build()
-
-        /* Send INSERT message. */
-        stub.onNext(insertMessage)
     }
 
     /* Commit message. */
@@ -203,11 +203,11 @@ fun executeNearestNeighborQuery() = entities.forEach {
     /* Print results. */
     println("Results of kNN query for entity '${it.first}' (k = $k, column = 'feature'):")
     results.forEach { r -> r.resultsList.forEach { t -> println(t) }}
-
 }
 
-
-@ExperimentalTime
+/**
+ * Entry point for example program.
+ */
 fun main() {
     initializeSchema() /* Initialize empty schema ''. */
 
