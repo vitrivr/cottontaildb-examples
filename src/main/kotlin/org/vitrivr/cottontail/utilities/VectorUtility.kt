@@ -1,7 +1,13 @@
-package ch.unibas.dmi.dbis.cottontail.utilities
+package org.vitrivr.cottontail.utilities
 
 import java.util.*
 
+/**
+ * Utility class that can be used to generate random vectors and vector sequences.
+ *
+ * @author Ralph Gasser
+ * @version 1.0
+ */
 object VectorUtility {
 
     /** The random number generator used for vector generation. */
