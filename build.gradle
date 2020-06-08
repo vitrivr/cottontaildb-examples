@@ -46,6 +46,13 @@ protobuf {
 }
 
 task runKotlinExample(type: JavaExec) {
+    dependsOn 'generateProto'
+    main = 'org.vitrivr.cottontail.examples.ExamplesKt'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task runJavaExample(type: JavaExec) {
+    dependsOn 'generateProto'
     main = 'org.vitrivr.cottontail.examples.Examples'
     classpath = sourceSets.main.runtimeClasspath
 }

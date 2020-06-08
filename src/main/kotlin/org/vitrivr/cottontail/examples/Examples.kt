@@ -1,5 +1,3 @@
-@file:JvmName("Examples")
-
 package org.vitrivr.cottontail.examples
 
 import io.grpc.ManagedChannelBuilder
