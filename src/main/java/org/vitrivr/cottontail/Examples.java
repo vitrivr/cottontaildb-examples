@@ -41,7 +41,7 @@ public class Examples {
     private static final String SCHEMA_NAME = "cottontail_example";
 
     /** Name of the Cottontail DB Schema and dimension of its vector column. */
-    private static final Pair<String,Integer>[] ENTITIES = new Pair[]{Pair.of("scalablecolor", 64), Pair.of("cedd", 144), Pair.of("jhist", 578)};
+    private static final Pair<String,Integer>[] ENTITIES = new Pair[]{Pair.of("scalablecolor", 64), Pair.of("cedd", 144), Pair.of("jhist", 576)};
 
     /**
      * Creates a Cottontail DB schema named "cottontail_example" using the DDL Stub.
