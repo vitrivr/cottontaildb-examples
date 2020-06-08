@@ -27,3 +27,7 @@ To run the Java example, use the following command.
 ``./gradlew runJavaExample`` 
 
 Of course it is also possible to open the project in your favourite IDE and use it as a Gradle project from there.
+
+## Words on the example data
+
+The example data was taken from the [YLI feature corpus](https://multimediacommons.wordpress.com/features/). Namely, we're using LIRE features here. You can download the full dataset for the YFCC100M collection from [here](http://multimedia-commons.s3-website-us-west-2.amazonaws.com/).
