@@ -22,11 +22,7 @@ To run the Kotlin example, use the following command.
 
 ``./gradlew runKotlinExample`` 
 
-To run the Java example, use the following command.
-
-``./gradlew runJavaExample`` 
-
-Of course it is also possible to open the project in your favourite IDE and use it as a Gradle project from there.
+Of course, it is also possible to open the project in your favourite IDE and use it as a Gradle project from there.
 
 ## Words on the example data
 
