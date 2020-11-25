@@ -86,10 +86,10 @@ public class Examples {
         for (Pair<String,Integer> entity : ENTITIES) {
 
             /* Prepare stub for INSERT. */
-            final StreamObserver<CottontailGrpc.InsertMessage> stub = DML_SERVICE.insert(new StreamObserver<CottontailGrpc.InsertStatus>() {
+            final StreamObserver<CottontailGrpc.InsertMessage> stub = DML_SERVICE.insert(new StreamObserver<CottontailGrpc.Status>() {
                 int counter = 0;
 
-                public void onNext(CottontailGrpc.InsertStatus value){
+                public void onNext(CottontailGrpc.Status value){
                     this.counter += 1;
                 }
 
@@ -123,7 +123,7 @@ public class Examples {
 
                     /* Prepare INSERT message. */
                     final CottontailGrpc.InsertMessage insertMessage = CottontailGrpc.InsertMessage.newBuilder()
-                            .setEntity(CottontailGrpc.Entity.newBuilder().setName(entity.getLeft()).setSchema(CottontailGrpc.Schema.newBuilder().setName(SCHEMA_NAME))) /* Entity the data should be inserted into. */
+                            .setFrom(CottontailGrpc.From.newBuilder().setEntity(CottontailGrpc.Entity.newBuilder().setName(entity.getLeft()).setSchema(CottontailGrpc.Schema.newBuilder().setName(SCHEMA_NAME)))) /* Entity the data should be inserted into. */
                             .setTuple(CottontailGrpc.Tuple.newBuilder()
                                     .putData("id", id) /* Data for first (id) column. */
                                     .putData("feature", feature) /* Data for second (feature) column. */

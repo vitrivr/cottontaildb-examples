@@ -73,8 +73,8 @@ fun importData() = entities.forEach {
     var counter = 0
 
     /* Prepare stub for INSERT. */
-    val stub = dmlService.insert(object: StreamObserver<CottontailGrpc.InsertStatus> {
-        override fun onNext(value: CottontailGrpc.InsertStatus?) {
+    val stub = dmlService.insert(object: StreamObserver<CottontailGrpc.Status> {
+        override fun onNext(value: CottontailGrpc.Status?) {
             counter += 1
         }
 
@@ -107,7 +107,7 @@ fun importData() = entities.forEach {
 
             /* Prepare INSERT message. */
             val insertMessage = CottontailGrpc.InsertMessage.newBuilder()
-                .setEntity(CottontailGrpc.Entity.newBuilder().setName(it.first).setSchema(CottontailGrpc.Schema.newBuilder().setName(schema_name))) /* Entity the data should be inserted into. */
+                .setFrom(CottontailGrpc.From.newBuilder().setEntity(CottontailGrpc.Entity.newBuilder().setName(it.first).setSchema(CottontailGrpc.Schema.newBuilder().setName(schema_name)))) /* Entity the data should be inserted into. */
                 .setTuple(CottontailGrpc.Tuple.newBuilder()
                     .putData("id", id) /* Data for first (id) column. */
                     .putData("feature", feature) /* Data for second (feature) column. */
