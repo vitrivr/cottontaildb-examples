@@ -12,11 +12,7 @@ Furthermore, you will need **Java 8** or newer on the machine you're running the
 
 Checkout the repository to your local machine by using the following command.
 
-``git clone --recurse-submodules https://github.com/vitrivr/cottontaildb-examples.git``
-
-Make sure, that the **cottontaildb-proto** submodule was checked out too! Then generate the Java code for the ProtoBuf definitions by calling from within the project directory.
-
-``./gradlew clean generateProto`` 
+``git clone https://github.com/vitrivr/cottontaildb-examples.git``
 
 To run the Kotlin example, use the following command from within the project directory.
 
