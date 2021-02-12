@@ -17,12 +17,15 @@ compileTestKotlin {
 }
 
 task runKotlinExample(type: JavaExec) {
-    dependsOn 'generateProto'
     main = 'org.vitrivr.cottontail.examples.ExamplesKt'
     classpath = sourceSets.main.runtimeClasspath
 }
 
 dependencies {
+
+    ///// Cottontail DB Driver
+    compile group: 'org.vitrivr', name: 'cottontaildb-proto', version: '0.10.0'
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-script-runtime', version: '1.4.10'
 
