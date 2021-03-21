@@ -68,7 +68,7 @@ public class Examples {
             final CottontailGrpc.EntityDefinition definition = CottontailGrpc.EntityDefinition.newBuilder()
                 .setEntity(CottontailGrpc.EntityName.newBuilder().setName(entity.getLeft()).setSchema(CottontailGrpc.SchemaName.newBuilder().setName(SCHEMA_NAME))) /* Name of entity and schema it belongs to. */
                 .addColumns(CottontailGrpc.ColumnDefinition.newBuilder().setType(CottontailGrpc.Type.STRING).setName("id").setEngine(CottontailGrpc.Engine.MAPDB).setNullable(false)) /* 1st column: id (String) */
-                .addColumns(CottontailGrpc.ColumnDefinition.newBuilder().setType(CottontailGrpc.Type.FLOAT_VEC).setName("feature").setNullable(false).setLength(entity.getRight()))  /* 2nd column: feature (float vector of given dimension). */
+                .addColumns(CottontailGrpc.ColumnDefinition.newBuilder().setType(CottontailGrpc.Type.FLOAT_VEC).setName("feature").setEngine(CottontailGrpc.Engine.MAPDB).setNullable(false).setLength(entity.getRight()))  /* 2nd column: feature (float vector of given dimension). */
                 .build();
 
             DDL_SERVICE.createEntity(CottontailGrpc.CreateEntityMessage.newBuilder().setDefinition(definition).build());

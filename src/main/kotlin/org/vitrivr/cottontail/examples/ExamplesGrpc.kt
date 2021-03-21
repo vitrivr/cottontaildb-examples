@@ -59,8 +59,8 @@ fun dropSchema() {
 fun initializeEntities() = entities.forEach {
     val definition = CottontailGrpc.EntityDefinition.newBuilder()
         .setEntity(CottontailGrpc.EntityName.newBuilder().setName(it.first).setSchema(CottontailGrpc.SchemaName.newBuilder().setName(schema_name))) /* Name of entity and schema it belongs to. */
-        .addColumns(CottontailGrpc.ColumnDefinition.newBuilder().setType(CottontailGrpc.Type.STRING).setName("id").setNullable(false)) /* 1st column: id (String) */
-        .addColumns(CottontailGrpc.ColumnDefinition.newBuilder().setType(CottontailGrpc.Type.FLOAT_VEC).setName("feature").setNullable(false).setLength(it.second)) /* 2nd column: feature (float vector of given dimension). */
+        .addColumns(CottontailGrpc.ColumnDefinition.newBuilder().setType(CottontailGrpc.Type.STRING).setEngine(CottontailGrpc.Engine.MAPDB).setName("id").setNullable(false)) /* 1st column: id (String) */
+        .addColumns(CottontailGrpc.ColumnDefinition.newBuilder().setType(CottontailGrpc.Type.FLOAT_VEC).setEngine(CottontailGrpc.Engine.MAPDB).setName("feature").setNullable(false).setLength(it.second)) /* 2nd column: feature (float vector of given dimension). */
         .build()
 
     ddlService.createEntity(CottontailGrpc.CreateEntityMessage.newBuilder().setDefinition(definition).build())
