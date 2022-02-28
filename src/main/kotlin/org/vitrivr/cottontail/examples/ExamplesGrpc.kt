@@ -10,6 +10,12 @@ import org.vitrivr.cottontail.utilities.VectorUtility
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
+/**
+ * Example code for the use of Cottontail DB gRCP client library in Kotlin.
+ *
+ * @author Ralph Gasser
+ * @version 1.0.1
+ */
 object ExamplesGrpc {
 
     /** Cottontail DB gRPC channel; adjust Cottontail DB host and port according to your needs. */

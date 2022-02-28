@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 import java.util.Iterator;
 
 /**
- * Example code for the use of Cottontail DB.
+ * Example code for the use of Cottontail DB gRCP client library in Java.
  *
  * @author Ralph Gasser
  * @version 1.0.1
