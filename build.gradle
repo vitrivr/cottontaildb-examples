@@ -17,7 +17,7 @@ compileTestKotlin {
 }
 
 task runKotlinExample(type: JavaExec) {
-    main = 'org.vitrivr.cottontail.examples.ExamplesKt'
+    main = 'org.vitrivr.cottontail.examples.ExamplesGrpcKt'
     classpath = sourceSets.main.runtimeClasspath
 }
 

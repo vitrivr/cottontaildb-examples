@@ -4,7 +4,7 @@ This repository contains some simple examples as to how to use Cottontail DB usi
 
 ## Prerequites
 
-You need an instance of Cottontail DB running either on localhost or some remote host of your choice. In case you're not running Cottontail DB on the same host, make sure to adjust hostname and IP address in example scripts (Examples.kt or Examples.java). Same holds true if you're running Cottontail DB on a different port than **1865**.
+You need an instance of Cottontail DB running either on localhost or some remote host of your choice. In case you're not running Cottontail DB on the same host, make sure to adjust hostname and IP address in example scripts (`ExamplesGrpc.kt`, `ExamplesSimple.kt` or `Examples.java`). Same holds true if you're running Cottontail DB on a different port than **1865**.
 
 Furthermore, you will need **Java 8** or newer on the machine you're running the example project on. The project comes with a Gradle Wrapper, so no need to have Gradle installed locally.
 
