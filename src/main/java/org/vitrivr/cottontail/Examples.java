@@ -18,7 +18,7 @@ import java.util.Iterator;
  * Example code for the use of Cottontail DB.
  *
  * @author Ralph Gasser
- * @version 1.0
+ * @version 1.0.1
  */
 public class Examples {
     /** Cottontail DB gRPC channel; adjust Cottontail DB host and port according to your needs. */
@@ -67,8 +67,8 @@ public class Examples {
         for (Pair<String,Integer> entity : ENTITIES) {
             final CottontailGrpc.EntityDefinition definition = CottontailGrpc.EntityDefinition.newBuilder()
                 .setEntity(CottontailGrpc.EntityName.newBuilder().setName(entity.getLeft()).setSchema(CottontailGrpc.SchemaName.newBuilder().setName(SCHEMA_NAME))) /* Name of entity and schema it belongs to. */
-                .addColumns(CottontailGrpc.ColumnDefinition.newBuilder().setType(CottontailGrpc.Type.STRING).setName("id").setEngine(CottontailGrpc.Engine.MAPDB).setNullable(false)) /* 1st column: id (String) */
-                .addColumns(CottontailGrpc.ColumnDefinition.newBuilder().setType(CottontailGrpc.Type.FLOAT_VEC).setName("feature").setEngine(CottontailGrpc.Engine.MAPDB).setNullable(false).setLength(entity.getRight()))  /* 2nd column: feature (float vector of given dimension). */
+                .addColumns(CottontailGrpc.ColumnDefinition.newBuilder().setType(CottontailGrpc.Type.STRING).setName(CottontailGrpc.ColumnName.newBuilder().setName("id")).setEngine(CottontailGrpc.Engine.MAPDB).setNullable(false)) /* 1st column: id (String) */
+                .addColumns(CottontailGrpc.ColumnDefinition.newBuilder().setType(CottontailGrpc.Type.FLOAT_VEC).setName(CottontailGrpc.ColumnName.newBuilder().setName("feature")).setEngine(CottontailGrpc.Engine.MAPDB).setNullable(false).setLength(entity.getRight()))  /* 2nd column: feature (float vector of given dimension). */
                 .build();
 
             DDL_SERVICE.createEntity(CottontailGrpc.CreateEntityMessage.newBuilder().setDefinition(definition).build());
@@ -82,7 +82,7 @@ public class Examples {
     public static void importData() {
         for (Pair<String,Integer> entity : ENTITIES) {
             /* Start a transaction per INSERT. */
-            final CottontailGrpc.TransactionId txId = TXN_SERVICE.begin(Empty.getDefaultInstance());
+            final long txId = TXN_SERVICE.begin(Empty.getDefaultInstance()).getTransactionId();
 
             /* Load data from file (in resources folder). */
 
@@ -104,19 +104,19 @@ public class Examples {
 
                     /* Prepare INSERT message. */
                     final CottontailGrpc.InsertMessage insertMessage = CottontailGrpc.InsertMessage.newBuilder()
-                        .setTxId(txId)
+                        .setMetadata(CottontailGrpc.Metadata.newBuilder().setTransactionId(txId).build())
                         .setFrom(CottontailGrpc.From.newBuilder().setScan(CottontailGrpc.Scan.newBuilder().setEntity(CottontailGrpc.EntityName.newBuilder().setName(entity.getLeft()).setSchema(CottontailGrpc.SchemaName.newBuilder().setName(SCHEMA_NAME))))) /* Entity the data should be inserted into. */
-                        .addInserts(CottontailGrpc.InsertMessage.InsertElement.newBuilder().setColumn(CottontailGrpc.ColumnName.newBuilder().setName("id")).setValue(id).build())
-                        .addInserts(CottontailGrpc.InsertMessage.InsertElement.newBuilder().setColumn(CottontailGrpc.ColumnName.newBuilder().setName("feature")).setValue(feature).build())
+                        .addElements(CottontailGrpc.InsertMessage.InsertElement.newBuilder().setColumn(CottontailGrpc.ColumnName.newBuilder().setName("id")).setValue(id).build())
+                        .addElements(CottontailGrpc.InsertMessage.InsertElement.newBuilder().setColumn(CottontailGrpc.ColumnName.newBuilder().setName("feature")).setValue(feature).build())
                         .build();
 
                     /* Send INSERT message. */
                     DML_SERVICE.insert(insertMessage);
                 }
-                TXN_SERVICE.commit(txId);
+                TXN_SERVICE.commit(CottontailGrpc.Metadata.newBuilder().setTransactionId(txId).build());
             } catch (IOException e) {
                 System.out.println("Exception during data import.");
-                TXN_SERVICE.rollback(txId);
+                TXN_SERVICE.rollback(CottontailGrpc.Metadata.newBuilder().setTransactionId(txId).build());
                 e.printStackTrace();
             }
         }
@@ -132,10 +132,10 @@ public class Examples {
                 CottontailGrpc.Query.newBuilder().setFrom(CottontailGrpc.From.newBuilder().setScan(
                     CottontailGrpc.Scan.newBuilder().setEntity(CottontailGrpc.EntityName.newBuilder().setName(entity.getLeft()).setSchema(CottontailGrpc.SchemaName.newBuilder().setName(SCHEMA_NAME))))
                 )
-                .setProjection(CottontailGrpc.Projection.newBuilder().addColumns(
+                .setProjection(CottontailGrpc.Projection.newBuilder().addElements(
                         CottontailGrpc.Projection.ProjectionElement.newBuilder().setColumn(CottontailGrpc.ColumnName.newBuilder().setName("*") /* Star projection. */
                 )))
-                .setLimit(3) /* Limit to top 3 entries. */
+                .setLimit(3) /* Limit first 3 entries. */
             ).build();
 
             /* Execute query. */
@@ -161,14 +161,13 @@ public class Examples {
                     CottontailGrpc.AtomicBooleanPredicate.newBuilder()
                         .setLeft(CottontailGrpc.ColumnName.newBuilder().setName("id").build())
                         .setOp(CottontailGrpc.ComparisonOperator.IN)
-                        .setRight(CottontailGrpc.AtomicBooleanOperand.newBuilder().setLiterals(
-                                CottontailGrpc.Literals.newBuilder()
-                                    .addLiteral(CottontailGrpc.Literal.newBuilder().setStringData("fca0132f519e71d13fb82b86964872").build()) /* matches cedd */
-                                    .addLiteral(CottontailGrpc.Literal.newBuilder().setStringData("0b414f0e6e82cd0aefae3d2bd791b2").build()) /* matches jhist */
-                                    .addLiteral(CottontailGrpc.Literal.newBuilder().setStringData("0f412c5bd41f9b91d8635bb1a886a36").build()) /* matches scalablecolor */
-                        ))
+                            .setRight(CottontailGrpc.AtomicBooleanOperand.newBuilder().setExpressions(CottontailGrpc.Expressions.newBuilder()
+                                .addExpression(CottontailGrpc.Expression.newBuilder().setLiteral(CottontailGrpc.Literal.newBuilder().setStringData("fca0132f519e71d13fb82b86964872"))) /* matches cedd */
+                                .addExpression(CottontailGrpc.Expression.newBuilder().setLiteral(CottontailGrpc.Literal.newBuilder().setStringData("0b414f0e6e82cd0aefae3d2bd791b2"))) /* matches jhist */
+                                .addExpression(CottontailGrpc.Expression.newBuilder().setLiteral(CottontailGrpc.Literal.newBuilder().setStringData("0f412c5bd41f9b91d8635bb1a886a36"))) /* matches scalablecolor */
+                            ))
                 ))
-                .setProjection(CottontailGrpc.Projection.newBuilder().addColumns(
+                .setProjection(CottontailGrpc.Projection.newBuilder().addElements(
                     CottontailGrpc.Projection.ProjectionElement.newBuilder().setColumn(CottontailGrpc.ColumnName.newBuilder().setName("*") /* Star projection. */
                 )))
             ).build();
@@ -201,12 +200,16 @@ public class Examples {
                 CottontailGrpc.Query.newBuilder().setFrom(CottontailGrpc.From.newBuilder().setScan(
                     CottontailGrpc.Scan.newBuilder().setEntity(CottontailGrpc.EntityName.newBuilder().setName(entity.getLeft()).setSchema(CottontailGrpc.SchemaName.newBuilder().setName(SCHEMA_NAME)))).build() /* Entity to select data from. */
                 )
-                .setKnn(CottontailGrpc.Knn.newBuilder().setK(k).setAttribute(CottontailGrpc.ColumnName.newBuilder().setName("feature")).setDistance(CottontailGrpc.Knn.Distance.L2).setQuery(CottontailGrpc.Vector.newBuilder().setFloatVector(vector))) /* kNN predicate on the column 'feature' with k = 10 and L2 distance. */
-                .setProjection(CottontailGrpc.Projection.newBuilder().addColumns(
-                  CottontailGrpc.Projection.ProjectionElement.newBuilder().setColumn(CottontailGrpc.ColumnName.newBuilder().setName("id")) /* Star projection. */
-                ).addColumns(
-                  CottontailGrpc.Projection.ProjectionElement.newBuilder().setColumn(CottontailGrpc.ColumnName.newBuilder().setName("distance")) /* Star projection. */
-                ))
+                .setProjection(CottontailGrpc.Projection.newBuilder()
+                        .addElements(CottontailGrpc.Projection.ProjectionElement.newBuilder().setColumn(CottontailGrpc.ColumnName.newBuilder().setName("id"))) /* Project: Id column */
+                        .addElements(CottontailGrpc.Projection.ProjectionElement.newBuilder().setAlias(CottontailGrpc.ColumnName.newBuilder().setName("distance")) /* Project: Execute distance function --> store in alias. */
+                            .setFunction(CottontailGrpc.Function.newBuilder()
+                                .setName(CottontailGrpc.FunctionName.newBuilder().setName("euclidean"))
+                                .addArguments(CottontailGrpc.Expression.newBuilder().setLiteral(CottontailGrpc.Literal.newBuilder().setVectorData(CottontailGrpc.Vector.newBuilder().setFloatVector(vector))))
+                                .addArguments(CottontailGrpc.Expression.newBuilder().setColumn(CottontailGrpc.ColumnName.newBuilder().setName("feature")))
+                            )))
+                .setOrder(CottontailGrpc.Order.newBuilder().addComponents(CottontailGrpc.Order.Component.newBuilder().setColumn(CottontailGrpc.ColumnName.newBuilder().setName("distance")).setDirection(CottontailGrpc.Order.Direction.ASCENDING)))
+                .setLimit(k)
             ).build();
 
             /* Execute query. */
